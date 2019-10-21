@@ -4,6 +4,7 @@ import argparse
 from helptxt import *
 from helpjson import load_json
 from buildpredictions import *
+import simplifier
 
 def create_arguments():
     parser = argparse.ArgumentParser()
@@ -43,6 +44,7 @@ def save_predicts_and_references_anon(data, name_predictions, name_references, t
     save_txt(name_predictions, predictions_anon)
     save_txt(name_references, references_anon)
 
+
 args = create_arguments()
 
 constructor = PhraseConstructor()
@@ -59,6 +61,10 @@ builder = BuilderPredictions()
 builder.build_predictions(references_predtions, data, args.type_evaluation)
 
 save_predicts_and_references_anon(data, args.output_predictions, args.output_references, args.type_evaluation)
+
+
+simplifier.deAnonymizeAmr([args.output_predictions, args.output_references])
+
 
 #python amr_simplifier/anonymized.py ../neural-graph-to-seq-mp/amr_ref_anon.txt
 #mv amr_full.txt amr_anon_ref_full.txt

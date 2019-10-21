@@ -31,8 +31,9 @@ class PhraseConstructor:
 
     def construct_phrases(self, data, data_ln_anon_amr, type_evaluation):
         type = type_evaluation.split('_')[1]
-        for d in data:
-            for r in d['regions']:
+        for j, d in enumerate(data):
+            print(j)
+            for r in d['regions']:                
                 index = [i for i, v in enumerate(data_ln_anon_amr[type]) if v == r['phrase']]
                 assert len(index) > 0
                 i = index[0]        
@@ -45,7 +46,6 @@ class PhraseConstructor:
 
                 r['phrase']['amr'] = self._construct_amr(amr_anon_ref, amr_full_ref)
                 r['phrase']['ln']  = self._construct_nl(ln_ref)            
-
-                #r['phrase'] = self.phrases    
+   
                 
         return data
