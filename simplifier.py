@@ -1,15 +1,13 @@
 import subprocess
-from helptxt import *
 import os
 
-
-def deAnonymizeAmr(files_name):
+def deAnonymizeAmr(anon):
     path_current = os.getcwd()
-    for file_name in files_name:
-        data = load_txt(file_name)
 
-        data_amr_full = []
-        for _, d in enumerate(data):
+    amr_full = []
+    for a in anon:
+        amr = []
+        for d in a:
             command = './anonDeAnon_java.sh deAnonymizeAmr false "%s"'%(d.replace('\n', ''))
             print(command)
 
@@ -20,15 +18,10 @@ def deAnonymizeAmr(files_name):
             result = r.decode("utf-8")
             
             if 'FAILED_TO_PARSE' in result:
-                data_amr_full.append(str(r) + '\n')
+                amr.append(str(r) + '\n')
             else:
-                data_amr_full.append(result.split('#')[0]+'\n\n')
-
-        name_new_file = '_full.'.join(file_name.split('.'))
-        
-        print(name_new_file)
-        print(type(name_new_file))
-        save_txt(str(name_new_file), data_amr_full)
-
-        #break
-
+                amr.append(result.split('#')[0]+'\n\n')
+                
+        amr_full.append(amr)
+    
+    return amr_full

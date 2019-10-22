@@ -1,10 +1,13 @@
+# coding=utf-8
+
 from loadfromcheckpoints import LoadFromCheckpoint
 from phraseconstructor import *
 import argparse
-from helptxt import *
+from parser_anon_to_ln import ParserAnonToNl
 from helpjson import load_json
+from helptxt import load_txt
 from buildpredictions import *
-import simplifier
+import pandas as pd
 
 def create_arguments():
     parser = argparse.ArgumentParser()
@@ -28,22 +31,27 @@ def obtain_phrases(data):
     
     return {'ln':phrases_ln, 'anon':phrases_anon, 'amr':phrases_amr}  
 
-def save_predicts_and_references_anon(data, name_predictions, name_references, type_evaluation):
-    references_anon  = []
-    predictions_anon = []
-    first_type = type_evaluation.split('_')[0]
-
+def save_csv(data):
+    data_csv = []
     for d in data:
-        for region in d['regions']:
+        for i, region in enumerate(d['regions']):
             if not region['phrase']['amr']['amr_anon_pred']:
                 break
-            
-            predictions_anon.append(region['phrase'][first_type][type_evaluation + '_pred'] + '\n')
-            references_anon.append( region['phrase'][first_type][type_evaluation + '_ref']  + '\n')
 
-    save_txt(name_predictions, predictions_anon)
-    save_txt(name_references, references_anon)
+            data_csv.append(['{}-{}'.format(d['id'],i), 
+                        region['phrase']['ln']['ln_ref'], 
+                        region['phrase']['amr']['amr_full_ref'], 
+                        region['phrase']['amr']['amr_anon_ref'],
+                        region['phrase']['ln']['ln_ref_anon'],
+                        region['phrase']['amr']['amr_anon_ref_full'],
+                        region['phrase']['amr']['amr_anon_pred'],
+                        region['phrase']['ln']['ln_pred'],
+                        region['phrase']['amr']['amr_anon_pred_full']])
+                    
+    df = pd.DataFrame(data_csv, columns = ['Chave', 'Referência LN', 'Referência AMR', 'Referência Anon', 'Predita LN Referência Anon', 
+                                        'Referência Anon Transformada em full', 'Predita Anon', 'Predita LN', 'Predita Anon Transformada em full'])                
 
+    df.to_csv('saida.csv')
 
 args = create_arguments()
 
@@ -60,10 +68,16 @@ references_predtions = loader.obtain_predict_and_reference(load_txt(args.evaluat
 builder = BuilderPredictions()
 builder.build_predictions(references_predtions, data, args.type_evaluation)
 
-save_predicts_and_references_anon(data, args.output_predictions, args.output_references, args.type_evaluation)
+parser_anon_nl = ParserAnonToNl(data)
+parser_anon_nl.parse(args.type_evaluation)
+
+save_csv(parser_anon_nl.data)
 
 
-simplifier.deAnonymizeAmr([args.output_predictions, args.output_references])
+#python src_g2s/G2S_beam_decoder.py --model_prefix logs_g2s/G2S.silver_2m --in_path test_ref.json --out_path ln_ref.parsed --mode beam
+#python src_g2s/G2S_beam_decoder.py --model_prefix logs_g2s/G2S.silver_2m --in_path test_pred.json --out_path ln_pred.parsed --mode beam
+
+#export CUDA_VISIBLE_DEVICES=0
 
 
 #python amr_simplifier/anonymized.py ../neural-graph-to-seq-mp/amr_ref_anon.txt

@@ -28,14 +28,24 @@ class PhraseConstructor:
         phrases['ln_ref_anon']         = ''
 
         return phrases
+    
+    def _indexes_by_phrase(self, data_ln_anon_amr, type):
+        self.indexes = dict()
+        for i, d in enumerate(data_ln_anon_amr[type]):
+
+            if d in self.indexes:
+                self.indexes[d].append(i)
+            else:
+                self.indexes[d] = [i]
 
     def construct_phrases(self, data, data_ln_anon_amr, type_evaluation):
         type = type_evaluation.split('_')[1]
-        for j, d in enumerate(data):
-            print(j)
-            for r in d['regions']:                
-                index = [i for i, v in enumerate(data_ln_anon_amr[type]) if v == r['phrase']]
-                assert len(index) > 0
+        self._indexes_by_phrase(data_ln_anon_amr, type)
+
+        for d in data:
+            for r in d['regions']:
+
+                index = self.indexes[r['phrase']]
                 i = index[0]        
 
                 amr_anon_ref = data_ln_anon_amr['anon'][i].replace('  ', ' ')        
@@ -46,6 +56,5 @@ class PhraseConstructor:
 
                 r['phrase']['amr'] = self._construct_amr(amr_anon_ref, amr_full_ref)
                 r['phrase']['ln']  = self._construct_nl(ln_ref)            
-   
-                
+                   
         return data

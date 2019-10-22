@@ -53,12 +53,15 @@ class PhraseCorrector:
     def fix_predict(self, predict):
         changes = True
         split = predict.split()
-        while 1:
-            if changes:
-                changes = False
-                changes_concept_parenthese, split = self._remove_last_concept_before_parentese(split)
-                changes_concept, split = self._remove_last_concept(split)
-                changes_parentheses, split = self._fix_parenthese(split)
-                changes = (changes_concept_parenthese or changes_concept or changes_parentheses) and True
-
+        
+        while changes:
+            changes = False
+                    
+            changes_concept_parenthese, split = self._remove_last_concept_before_parentese(split)
+            changes_concept, split            = self._remove_last_concept(split)
+            changes_parentheses, split        = self._fix_parenthese(split)
+            
+            if changes_concept_parenthese or changes_concept or changes_parentheses:
+                changes = True
+                    
         return ' '.join(split)

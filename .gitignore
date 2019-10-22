@@ -3,3 +3,8 @@ __pycache__
 .vscode
 checkpoints/*
 *.txt
+*.pyc
+amr_simplifier*
+neural-graph-to-seq-mp/
+*.csv
+.evaluate
