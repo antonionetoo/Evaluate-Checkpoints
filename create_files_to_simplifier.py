@@ -5,9 +5,10 @@ from phraseconstructor import *
 import argparse
 from parser_anon_to_ln import ParserAnonToNl
 from helpjson import load_json
-from helptxt import load_txt
+from helptxt import *
 from buildpredictions import *
 import pandas as pd
+import os
 
 def create_arguments():
     parser = argparse.ArgumentParser()
@@ -15,8 +16,6 @@ def create_arguments():
     parser.add_argument('-data_train')
     parser.add_argument('-data_ln_amr_anon')
     parser.add_argument('-type_evaluation')
-    parser.add_argument('-output_predictions')
-    parser.add_argument('-output_references')
     
     return parser.parse_args()
 
@@ -57,8 +56,8 @@ args = create_arguments()
 
 constructor = PhraseConstructor()
 
-data_ln_amr_anon   = obtain_phrases(load_json(args.data_ln_amr_anon))
-data               = load_json(args.data_train)
+data_ln_amr_anon = obtain_phrases(load_json(args.data_ln_amr_anon))
+data             = load_json(args.data_train)
 
 data = constructor.construct_phrases(data, data_ln_amr_anon, args.type_evaluation)
 
@@ -70,6 +69,29 @@ builder.build_predictions(references_predtions, data, args.type_evaluation)
 
 parser_anon_nl = ParserAnonToNl(data)
 parser_anon_nl.parse(args.type_evaluation)
+
+
+ln_preds     = []
+ln_refs      = []
+ln_refs_anon = []
+
+for d in parser_anon_nl.data:
+    for region in d['regions']:
+            if not region['phrase']['amr']['amr_anon_pred']:
+                break
+
+            ln_refs.append(region['phrase']['ln']['ln_ref'] + '\n')
+            ln_preds.append(region['phrase']['ln']['ln_pred'] + '\n')
+            ln_refs_anon.append(region['phrase']['ln']['ln_ref_anon'] + '\n')
+
+save_txt('ln_refs.txt', ln_refs)
+save_txt('ln_preds.txt', ln_preds)
+save_txt('ln_refs_anon.txt', ln_refs_anon)
+
+os.system('python3 evaluatenl.py -refs ln_refs.txt -pred ln_preds.txt -refs_anon ln_refs_anon.txt')
+#eval = load_json('eval.json')
+
+
 
 save_csv(parser_anon_nl.data)
 

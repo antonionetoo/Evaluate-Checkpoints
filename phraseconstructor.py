@@ -50,7 +50,7 @@ class PhraseConstructor:
 
                 amr_anon_ref = data_ln_anon_amr['anon'][i].replace('  ', ' ')        
                 amr_full_ref = data_ln_anon_amr['amr'][i]
-                ln_ref = data_ln_anon_amr['ln'][i]
+                ln_ref       = data_ln_anon_amr['ln'][i]
 
                 r['phrase'] = dict()
 
