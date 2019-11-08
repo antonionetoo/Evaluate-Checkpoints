@@ -4,7 +4,7 @@ from loadfromcheckpoints import LoadFromCheckpoint
 from phraseconstructor import *
 import argparse
 from parser_anon_to_ln import ParserAnonToNl
-from helpjson import load_json
+from helpjson import *
 from helptxt import *
 from buildpredictions import *
 import pandas as pd
@@ -50,7 +50,7 @@ def save_csv(data):
         for i, region in enumerate(d['regions']):
             if not region['phrase']['amr']['amr_anon_pred']:
                 break
-
+            
             data_csv.append(['{}-{}'.format(d['id'],i), 
                         region['phrase']['ln']['ln_ref'], 
                         region['phrase']['amr']['amr_full_ref'], 
@@ -66,13 +66,30 @@ def save_csv(data):
 
     df.to_csv('saida.csv')
 
-args = create_arguments()
+def evaluate(data):
+    save_txt('ln_refs.txt', get_phrase(data, 'ln', 'ln_ref'))
+    save_txt('ln_preds.txt', get_phrase(data, 'ln', 'ln_pred'))
+    save_txt('ln_refs_anon.txt', get_phrase(data, 'ln', 'ln_ref_anon'))
 
-constructor = PhraseConstructor()
+    os.system('python3 evaluatenl.py -refs ln_refs.txt -pred ln_preds.txt -refs_anon ln_refs_anon.txt')
+
+    amr_anon_pred_full = get_phrase(data, 'amr', 'amr_anon_pred_full', '\n\n')
+    ids = [i for i, a in enumerate(amr_anon_pred_full) if not a.startswith('FAILED')]
+
+    amr_full_ref = [a for i, a in enumerate(get_phrase(data, 'amr', 'amr_full_ref', '\n\n')) if i in ids]
+    amr_anon_ref_full = [a for i, a in enumerate(get_phrase(data, 'amr', 'amr_anon_ref_full', '\n\n')) if i in ids]
+    amr_anon_pred_full = [a for i, a in enumerate(amr_anon_pred_full) if i in ids]
+
+    eval_amr = EvaluateAMR()
+    eval_amr.evaluate(amr_full_ref, amr_anon_ref_full, amr_anon_pred_full)
+    
+
+args = create_arguments()
 
 data_ln_amr_anon = obtain_phrases(load_json(args.data_ln_amr_anon))
 data             = load_json(args.data_train)
 
+constructor = PhraseConstructor()
 data = constructor.construct_phrases(data, load_json(args.data_ln), data_ln_amr_anon, args.type_evaluation)
 
 loader = LoadFromCheckpoint()
@@ -84,20 +101,7 @@ builder.build_predictions(references_predtions, data, args.type_evaluation)
 parser_anon_nl = ParserAnonToNl(data)
 parser_anon_nl.parse(args.type_evaluation)
 
-save_txt('ln_refs.txt', get_phrase(parser_anon_nl.data, 'ln', 'ln_ref'))
-save_txt('ln_preds.txt', get_phrase(parser_anon_nl.data, 'ln', 'ln_pred'))
-save_txt('ln_refs_anon.txt', get_phrase(parser_anon_nl.data, 'ln', 'ln_ref_anon'))
-
-os.system('python3 evaluatenl.py -refs ln_refs.txt -pred ln_preds.txt -refs_anon ln_refs_anon.txt')
-
-amr_anon_pred_full = get_phrase(parser_anon_nl.data, 'amr', 'amr_anon_pred_full', '\n\n')
-ids = [i for i, a in enumerate(amr_anon_pred_full) if not a.startswith('FAILED')]
-
-amr_full_ref = [a for i, a in enumerate(get_phrase(parser_anon_nl.data, 'amr', 'amr_full_ref', '\n\n')) if i in ids]
-amr_anon_ref_full = [a for i, a in enumerate(get_phrase(parser_anon_nl.data, 'amr', 'amr_anon_ref_full', '\n\n')) if i in ids]
-amr_anon_pred_full = [a for i, a in enumerate(amr_anon_pred_full) if i in ids]
-
-eval_amr = EvaluateAMR()
-eval_amr.evaluate(amr_full_ref, amr_anon_ref_full, amr_anon_pred_full)
-
+evaluate(parser_anon_nl.data)
 save_csv(parser_anon_nl.data)
+
+save_json('data.json', parser_anon_nl.data)

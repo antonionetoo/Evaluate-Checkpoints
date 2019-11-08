@@ -22,7 +22,7 @@ class EvaluateNL():
             self._metrics = [s[0] for s in scores]
 
             #data.append([ref, hyp])
-            data.append([ref, hyp, *[float('%0.6f'%(s[1])) for s in scores]])
+            data.append([ref, hyp, *[str(float('%0.6f'%(s[1]))).replace('.',',') for s in scores]])
 
         return pd.DataFrame(data, columns = ['Reference', 'Hypotesi', *self._metrics])
 

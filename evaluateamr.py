@@ -2,6 +2,8 @@ import os
 import argparse
 import subprocess
 from helptxt import save_txt
+from helpjson import save_json
+import csv
 
 class EvaluateAMR:
     def __init__(self):
@@ -78,3 +80,8 @@ class EvaluateAMR:
         self.evaluate_smatch()
         self.evaluate_sema()
         self.evaluate_sembleu()
+
+        os.chdir(self.path)
+        name_file_evaluate = 'evaluate_amr'
+
+        save_json(name_file_evaluate + '.json', self.results)
