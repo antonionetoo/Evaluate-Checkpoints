@@ -40,8 +40,7 @@ def get_phrase(data, type1, type2, end = '\n'):
             continue
 
         for region in d['regions']:    
-            if region['phrase']['ln']['ln_pred']:
-                result.append(region['phrase'][type1][type2] + end)
+            result.append(region['phrase'][type1][type2] + end)
 
     return result
 
@@ -96,7 +95,8 @@ data             = load_json(args.data_train)
 constructor = PhraseConstructor()
 data = constructor.construct_phrases(data, 
                                     load_json(args.data_ln), 
-                                    data_ln_amr_anon)
+                                    data_ln_amr_anon,
+                                    args.type_evaluation)
 
 loader = LoadFromCheckpoint()
 references_predtions = loader.obtain_predict_and_reference(load_txt(args.evaluate_checkpoint))

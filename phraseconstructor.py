@@ -29,7 +29,7 @@ class PhraseConstructor:
 
         return phrases
     
-    def _indexes_by_phrase(self, data, data_ln_anon_amr):
+    def _indexes_by_phrase(self, data, data_ln_anon_amr, type_evaluation):
         indexes_ln = dict()
         for i, d in enumerate(data_ln_anon_amr['ln']):
 
@@ -48,8 +48,8 @@ class PhraseConstructor:
                 key = '{}-{}'.format(d['id'], j)
                 self.indexes[key] = index
 
-    def construct_phrases(self, data, data_ln, data_ln_anon_amr):
-        self._indexes_by_phrase(data, data_ln_anon_amr)
+    def construct_phrases(self, data, data_ln, data_ln_anon_amr, type_evaluation):
+        self._indexes_by_phrase(data_ln, data_ln_anon_amr, type_evaluation)
 
         for d in data:
             d['test'] = False

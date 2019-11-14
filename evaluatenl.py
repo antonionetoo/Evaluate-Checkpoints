@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
     eval = EvaluateNL()
 
-    if args.type_evaluation == 'amr_anon':
+    if args.type_evaluation == 'anon':
         df = eval.compute(refs, refs_anon)
         df.to_csv('eval_refs_anon.csv')
         df.to_json('eval_refs_anon.json')
