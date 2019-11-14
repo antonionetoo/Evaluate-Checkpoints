@@ -1,26 +1,25 @@
-import subprocess
-import os
-from helptxt import load_txt
+import subprocess, os
 
 def deAnonymizeAmr(anon):
     path_current = os.getcwd()
-
     amr_full = []
-    os.chdir(path_current + '/amr_simplifier')
     for a in anon:
         amr = []
         for d in a:
-            command = './anonDeAnon_java.sh deAnonymizeAmr false "%s" > out.txt'%(d.replace('\n', ''))
+            if d in ['\n', '']:
+                continue
+
+            command = './anonDeAnon_java.sh deAnonymizeAmr false "%s"' % d.replace('\n', '')
             print(command)
-            os.system(command)
-            result = load_txt('out.txt')[0]
-            
+            os.chdir(path_current + '/amr_simplifier')
+            r = subprocess.Popen(command, shell=True, stdout=(subprocess.PIPE)).stdout.read()
+            os.chdir(path_current)
+            result = r.decode('utf-8')
             if 'FAILED_TO_PARSE' in result:
-                amr.append(str(result) + '\n')
+                amr.append(str(r) + '\n')
             else:
-                amr.append(result.split('#')[0]+'\n\n')
-                
+                amr.append(result.split('#')[0] + '\n\n')
+
         amr_full.append(amr)
-        
-    os.chdir(path_current)
+
     return amr_full

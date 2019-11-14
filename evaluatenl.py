@@ -1,4 +1,3 @@
-
 import sys
 import argparse
 from nlgeval import NLGEval
@@ -31,6 +30,7 @@ def create_arguments():
     parser.add_argument('-refs')
     parser.add_argument('-pred')
     parser.add_argument('-refs_anon')
+    parser.add_argument('-type_evaluation')
     
     return parser.parse_args()
 
@@ -44,9 +44,10 @@ if __name__ == '__main__':
 
     eval = EvaluateNL()
 
-    df = eval.compute(refs, refs_anon)
-    df.to_csv('eval_refs_anon.csv')
-    df.to_json('eval_refs_anon.json')
+    if args.type_evaluation == 'amr_anon':
+        df = eval.compute(refs, refs_anon)
+        df.to_csv('eval_refs_anon.csv')
+        df.to_json('eval_refs_anon.json')
 
     df  = eval.compute(refs, pred)
     df.to_csv('eval_refs_pred.csv')

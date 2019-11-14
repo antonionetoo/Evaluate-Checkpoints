@@ -1,7 +1,12 @@
+import os.path
+
 def load_txt(name):
-    with open(name, 'r') as f:
-        return f.readlines()          
+    if os.path.exists(name):
+        with open(name, 'r') as (f):
+            return f.readlines()
+    return []
+
 
 def save_txt(name, data):
-    with open(name, 'w') as f:
-        f.writelines(data)    
+    with open(name, 'w') as (f):
+        f.writelines(data)
