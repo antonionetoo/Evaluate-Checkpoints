@@ -12,9 +12,6 @@ class ParserAnonToNl:
         amr_anon_pred_full = iter([a for a in anon_full[1] if a != '\n'])
 
         for d in self.data:
-            if not d['test']:
-                continue
-
             for region in d['regions']:
                 region['phrase']['amr']['amr_anon_ref_full'] = next(amr_anon_ref_full).replace('\n', '')
                 region['phrase']['amr']['amr_anon_pred_full'] = next(amr_anon_pred_full, '').replace('\n', '')
@@ -24,11 +21,8 @@ class ParserAnonToNl:
         predictions_anon = []
         first_type = type_evaluation.split('_')[0]
 
-        for d in self.data:
-            if not d['test']:
-                continue
-            
-            for region in d['regions']:                
+        for d in self.data:            
+            for region in d['regions']:
                 predictions_anon.append(region['phrase'][first_type][type_evaluation + '_pred'] + '\n')
                 references_anon.append( region['phrase'][first_type][type_evaluation + '_ref']  + '\n')
         
@@ -82,9 +76,6 @@ class ParserAnonToNl:
 
     def build_ln(self, ln, change):
         for d in self.data:
-            if not d['test']:
-                continue
-
             for i, region in enumerate(d['regions']):
                 key = '{}-{}'.format(d['id'], i)
 
@@ -110,7 +101,7 @@ class ParserAnonToNl:
 
         if type_evaluation == 'anon':
             self.deAnonimized('pred.json', 'pred.parsed')
-            pred_parsed = self.load_parsed('neural-graph-to-seq-mp/pred.parsed')
+            pred_parsed = self.load_parsed('pred.parsed')
             self.build_ln(pred_parsed, 'ln_pred')
 
         os.chdir(path_current)       

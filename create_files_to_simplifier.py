@@ -36,9 +36,6 @@ def get_phrase(data, type1, type2, end = '\n'):
     result = []
 
     for d in data:
-        if not d['test']:
-            continue
-
         for region in d['regions']:    
             result.append(region['phrase'][type1][type2] + end)
 
@@ -47,9 +44,6 @@ def get_phrase(data, type1, type2, end = '\n'):
 def save_csv(data):
     data_csv = []
     for d in data:
-        if not d['test']:
-            continue
-        
         for i, region in enumerate(d['regions']):
             if not region['phrase']['ln']['ln_pred']:
                 break
@@ -77,19 +71,30 @@ def evaluate(data, type):
     os.system('python3 evaluatenl.py -refs ln_refs.txt -pred ln_preds.txt -refs_anon ln_refs_anon.txt -type_evaluation {}'.format(type))
 
     if not type == 'ln':
+        
+        #ids = [i for i, a in enumerate(amr_anon_pred_full) if not a.startswith('FAILED')]
+        ids = []
+
+        amr_full_ref       = get_phrase(data, 'amr', 'amr_full_ref', '\n\n')
+
+        amr_anon_ref_full  = get_phrase(data, 'amr', 'amr_anon_ref_full', '\n\n')
+        ids = [i for i, d in enumerate(amr_anon_ref_full) if d.startswith('FAILED')]
+
         amr_anon_pred_full = get_phrase(data, 'amr', 'amr_anon_pred_full', '\n\n')
-        ids = [i for i, a in enumerate(amr_anon_pred_full) if not a.startswith('FAILED')]
+        ids =  ids + [i for i, d in enumerate(amr_anon_pred_full) if d.startswith('FAILED')]
 
-        amr_full_ref = [a for i, a in enumerate(get_phrase(data, 'amr', 'amr_full_ref', '\n\n')) if i in ids]
-        amr_anon_ref_full = [a for i, a in enumerate(get_phrase(data, 'amr', 'amr_anon_ref_full', '\n\n')) if i in ids]
-        amr_anon_pred_full = [a for i, a in enumerate(amr_anon_pred_full) if i in ids]
-
+        # ids.append(174)
+        # ids.append(177)
+        
         eval_amr = EvaluateAMR()
-        eval_amr.evaluate(amr_full_ref, amr_anon_ref_full, amr_anon_pred_full)   
+        eval_amr.evaluate([d for i, d in enumerate(amr_full_ref) if i not in ids],
+                          [d for i, d in enumerate(amr_anon_ref_full) if i not in ids], 
+                          [d for i, d in enumerate(amr_anon_pred_full) if i not in ids]
+                          )   
 
 args = create_arguments()
 
-data_ln_amr_anon = obtain_phrases(load_json(args.data_ln_amr_anon))
+data_ln_amr_anon = load_json(args.data_ln_amr_anon)
 data             = load_json(args.data_train)
 
 constructor = PhraseConstructor()
@@ -102,7 +107,7 @@ loader = LoadFromCheckpoint()
 references_predtions = loader.obtain_predict_and_reference(load_txt(args.evaluate_checkpoint))
 
 builder = BuilderPredictions()
-builder.build_predictions(references_predtions, data, args.type_evaluation)
+data = builder.build_predictions(references_predtions, data, args.type_evaluation)
 
 parser_anon_nl = ParserAnonToNl(data)
 parser_anon_nl.parse(args.type_evaluation)

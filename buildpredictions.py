@@ -25,12 +25,14 @@ class BuilderPredictions:
                 if (' ').join(region['phrase'][keys[0]][keys[1]].split()) == reference:
                     region['phrase'][keys[0]][keys[2]] = d['predict']
                     data[index]['test'] = True
+                    region['test'] = True
                     break
             else:
                 amr_anon_ref = [ region['phrase'][keys[0]][keys[1]] for region in data[index]['regions'] ]
                 if ('. ').join(amr_anon_ref) == reference:
                     data[index]['test'] = True
                     for region in data[index]['regions']:
+                        region['test'] = True
                         region['phrase'][keys[0]][keys[1]] = reference
                         region['phrase'][keys[0]][keys[2]] = d['predict']
 
@@ -39,4 +41,21 @@ class BuilderPredictions:
                     print (reference)
                     assert False, 'build_predictions'
 
-        return data
+        new_data = []
+        for d in data:
+            if not d['test']:
+                continue
+
+            new_element = dict()
+            new_element['id'] = d['id']
+
+            new_regions = []
+            for region in d['regions']:
+                if 'test' in region:
+                    new_regions.append(region)
+            
+            new_element['regions'] = new_regions
+            
+            new_data.append(new_element)
+
+        return new_data

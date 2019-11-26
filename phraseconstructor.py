@@ -49,17 +49,17 @@ class PhraseConstructor:
                 self.indexes[key] = index
 
     def construct_phrases(self, data, data_ln, data_ln_anon_amr, type_evaluation):
-        self._indexes_by_phrase(data_ln, data_ln_anon_amr, type_evaluation)
+        #self._indexes_by_phrase(data_ln, data_ln_anon_amr, type_evaluation)
 
         for d in data:
             d['test'] = False
             for i, r in enumerate(d['regions']):
                 key = '{}-{}'.format(d['id'], i)
-                index = self.indexes[key]
+                #index = self.indexes[key]
 
-                amr_anon_ref = data_ln_anon_amr['anon'][index].replace('  ', ' ').lower()       
-                amr_full_ref = data_ln_anon_amr['amr'][index].lower()
-                ln_ref       = data_ln_anon_amr['ln'][index].lower()
+                ln_ref       = data_ln_anon_amr[key][0].lower()
+                amr_full_ref = data_ln_anon_amr[key][1].lower()
+                amr_anon_ref = data_ln_anon_amr[key][2].replace('  ', ' ').lower()       
 
                 r['phrase'] = dict()
 

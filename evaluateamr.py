@@ -24,41 +24,41 @@ class EvaluateAMR:
         result = subprocess.Popen(('python3 smatch.py --significant 4 -f ../{} ../{}'.format(self.name_file_ref, self.name_amr_anon_ref_full)),
           shell=True,
           stdout=(subprocess.PIPE)).stdout.read()
-        self.results['smatch'].append(result.split('\n')[(-2)])
+        self.results['smatch'].append(result.decode().split('\n')[(-2)])
         result = subprocess.Popen(('python3 smatch.py --significant 4 -f ../{} ../{}'.format(self.name_file_ref, self.name_anon_pred_full)),
           shell=True,
           stdout=(subprocess.PIPE)).stdout.read()
-        self.results['smatch'].append(result.split('\n')[(-2)])
+        self.results['smatch'].append(result.decode().split('\n')[(-2)])
         result = subprocess.Popen(('python3 smatch.py --significant 4 -f ../{} ../{}'.format(self.name_amr_anon_ref_full, self.name_anon_pred_full)),
           shell=True,
           stdout=(subprocess.PIPE)).stdout.read()
-        self.results['smatch'].append(result.split('\n')[(-2)])
+        self.results['smatch'].append(result.decode().split('\n')[(-2)])
 
     def evaluate_sema(self):
         self.results['sema'] = []
         os.chdir(self.path + '/sema/')
         result = subprocess.Popen(('python3 sema.py -g ../{} -t ../{}'.format(self.name_file_ref, self.name_amr_anon_ref_full)), shell=True,
           stdout=(subprocess.PIPE)).stdout.read()
-        self.results['sema'].append(result)
+        self.results['sema'].append(result.decode())
         result = subprocess.Popen(('python3 sema.py -g ../{} -t ../{}'.format(self.name_file_ref, self.name_anon_pred_full)), shell=True,
           stdout=(subprocess.PIPE)).stdout.read()
-        self.results['sema'].append(result)
+        self.results['sema'].append(result.decode())
         result = subprocess.Popen(('python3 sema.py -g ../{} -t ../{}'.format(self.name_amr_anon_ref_full, self.name_anon_pred_full)), shell=True,
           stdout=(subprocess.PIPE)).stdout.read()
-        self.results['sema'].append(result)
+        self.results['sema'].append(result.decode())
 
     def evaluate_sembleu(self):
         self.results['sembleu'] = []
         os.chdir(self.path + '/sembleu/')
         result = subprocess.Popen(('./eval.sh ../{1} ../{0}'.format(self.name_file_ref, self.name_amr_anon_ref_full)), shell=True,
           stdout=(subprocess.PIPE)).stdout.read()
-        self.results['sembleu'].append(result.split('\n')[2])
+        self.results['sembleu'].append(result.decode().split('\n')[2])
         result = subprocess.Popen(('./eval.sh ../{1} ../{0}'.format(self.name_file_ref, self.name_anon_pred_full)), shell=True,
           stdout=(subprocess.PIPE)).stdout.read()
-        self.results['sembleu'].append(result.split('\n')[2])
+        self.results['sembleu'].append(result.decode().split('\n')[2])
         result = subprocess.Popen(('./eval.sh ../{1} ../{0}'.format(self.name_amr_anon_ref_full, self.name_anon_pred_full)), shell=True,
           stdout=(subprocess.PIPE)).stdout.read()
-        self.results['sembleu'].append(result.split('\n')[2])
+        self.results['sembleu'].append(result.decode().split('\n')[2])
 
     def evaluate(self, ref_full, ref_anon_full, pred_anon_full):
         self.path = os.getcwd()

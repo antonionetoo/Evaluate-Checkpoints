@@ -16,7 +16,10 @@ class EvaluateNL():
             ref = ref.replace('\n', '')
             hyp = hyps[i].replace('\n', '')
 
-            scores = self.eval.compute_individual_metrics(ref = [ref.replace('\n', '')], hyp = hyp.replace('\n', ''))
+            if not ref:
+                continue
+
+            scores = self.eval.compute_individual_metrics(ref = [ref], hyp = hyp)
             scores = sorted(scores.items())
             self._metrics = [s[0] for s in scores]
 
