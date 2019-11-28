@@ -1,4 +1,6 @@
 
+import remove_punctuation as puctuation
+
 class BuilderPredictions:
 
     def __init__(self):
@@ -23,7 +25,7 @@ class BuilderPredictions:
             reference = d['reference']
             for region in data[index]['regions']:
                 if (' ').join(region['phrase'][keys[0]][keys[1]].split()) == reference:
-                    region['phrase'][keys[0]][keys[2]] = d['predict']
+                    region['phrase'][keys[0]][keys[2]] = (d['predict'] if not 'ln' == type_evaluation else puctuation.remove(d['predict']))
                     data[index]['test'] = True
                     region['test'] = True
                     break
@@ -33,8 +35,8 @@ class BuilderPredictions:
                     data[index]['test'] = True
                     for region in data[index]['regions']:
                         region['test'] = True
-                        region['phrase'][keys[0]][keys[1]] = reference
-                        region['phrase'][keys[0]][keys[2]] = d['predict']
+                        region['phrase'][keys[0]][keys[1]] = (reference if not 'ln' == type_evaluation else puctuation.remove(remove))
+                        region['phrase'][keys[0]][keys[2]] = (d['predict'] if not 'ln' == type_evaluation else puctuation.remove(d['predict']))
 
                 else:
                     print (d['id'])

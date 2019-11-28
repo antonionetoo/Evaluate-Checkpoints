@@ -2,6 +2,7 @@ import os
 import simplifier
 from helptxt import load_txt
 from helpjson import save_json
+import remove_punctuation as punctutation
 
 class ParserAnonToNl:
     def __init__(self, data):
@@ -80,7 +81,7 @@ class ParserAnonToNl:
                 key = '{}-{}'.format(d['id'], i)
 
                 if key in ln: #fusion regions
-                    region['phrase']['ln'][change] = ln[key]['hipotese']    
+                    region['phrase']['ln'][change] = punctutation.remove(ln[key]['hipotese'])
 
     def parse(self, type_evaluation):
         predictions_anon, references_anon = self._get_predicts_and_references('amr_anon')
