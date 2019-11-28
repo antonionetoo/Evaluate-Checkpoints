@@ -20,10 +20,10 @@ class PhraseConstructor:
 
         return phrases
 
-
     def _construct_nl(self, ln_ref):
         phrases             = dict()
-        phrases['ln_ref']   = puctuation.remove(ln_ref) 
+        #phrases['ln_ref']   = puctuation.remove(ln_ref) 
+        phrases['ln_ref']   = ln_ref
         phrases['ln_pred']  = ''
         
         #preditas a partir da anon de referencia

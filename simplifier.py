@@ -4,7 +4,7 @@ def deAnonymizeAmr(anon):
     path_current = os.getcwd()
     os.chdir(path_current + '/amr_simplifier')
     amr_full = []
-    for i, a in enumerate(anon):
+    for a in anon:
         amr = []
         for d in a:
             command = './anonDeAnon_java.sh deAnonymizeAmr false "%s"' % d.replace('\n', '')
